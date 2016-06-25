@@ -5,35 +5,28 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Set;
 import java.util.UUID;
-import java.util.logging.FileHandler;
-import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final UUID PORT_UUID = new UUID(115200, 0);
+    private static final UUID PORT_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     TextView largeText;
     TextView smallText;
     BluetoothAdapter bluetoothAdapter;
     BluetoothDevice device;
-    BufferedInputStream inputStream;
-    Handler handler;
+    OutputStream outputStream;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,43 +42,11 @@ public class MainActivity extends AppCompatActivity {
         if (bluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Device doesnt Support Bluetooth", Toast.LENGTH_SHORT).show();
         }
-
-        if(!bluetoothAdapter.isEnabled()) {
+        if (!bluetoothAdapter.isEnabled()) {
             Intent enableAdapter = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableAdapter, 0);
         }
 
-        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices(); // get connected devices from the adapter
-
-        if(bondedDevices.isEmpty()) { // if the device is connected
-            Toast.makeText(getApplicationContext(),"Please Pair the Device first",Toast.LENGTH_SHORT).show();
-        } else {
-            for (BluetoothDevice iterator : bondedDevices) {
-                Log.i("Device Address", iterator.getAddress());
-            }
-        }
-
-        BluetoothSocket socket = null;
-
-//        handler = new FileHandler();
-        try {
-            socket = device.createRfcommSocketToServiceRecord(PORT_UUID);
-            socket.connect();
-            inputStream = new BufferedInputStream(socket.getInputStream());
-            int byteCount = inputStream.available();
-
-            if(byteCount > 0){
-                byte[] rawBytes = new byte[byteCount];
-                inputStream.read(rawBytes);
-                final String string=new String(rawBytes,"UTF-8");
-
-                MainActivity.this.runOnUiThread(
-                        new Runnable() {
-                            public void run() { smallText.append(string); } });
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
     }
 
@@ -111,23 +72,49 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void connect(View view){
+    public void connect(View view) {
+        Set<BluetoothDevice> bondedDevices = bluetoothAdapter.getBondedDevices(); // get connected devices from the adapter
+
+        if (bondedDevices.isEmpty()) { // if the device is connected
+            Toast.makeText(getApplicationContext(), "Please Pair the Device first", Toast.LENGTH_SHORT).show();
+        } else {
+            for (BluetoothDevice iterator : bondedDevices) {
+                Log.i("Device", iterator.getAddress());
+                device = iterator;
+                Log.i("Device", String.valueOf(bondedDevices.size()));
+            }
+            Log.i("Device","Does this print");
+        }
+
+        System.out.println("HELLOOOOOOOOOOOOOOOOOOOOOOOO");
+        Log.i("Device","Hello1");
+        BluetoothSocket socket = null;
+        try {
+            Log.i("Device","Hello2");
+            socket = device.createRfcommSocketToServiceRecord(PORT_UUID);
+            socket.connect();
+            outputStream = socket.getOutputStream();
+            String msg = "HELLOO!!!!! James\n";
+            outputStream.write(msg.getBytes());
+            Log.i("Device","Hello!!!!!!");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void disconnect(View view) {
 
     }
 
-    public void disconnect(View view){
-
-    }
-
-    public void setLargeText(String s){
+    public void setLargeText(String s) {
         largeText.setText(s);
     }
 
     public void addToSamllText(char c) {
-        smallText.setText(smallText.getText().toString() + c );
+        smallText.setText(smallText.getText().toString() + c);
     }
 
-    public void resetSmallText(View view){
+    public void resetSmallText(View view) {
         smallText.setText("");
 
     }
