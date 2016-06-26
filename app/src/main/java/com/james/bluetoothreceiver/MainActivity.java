@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView messageView;
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket socket;
+    private Button button_connect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +39,12 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         connectionMessageView = (TextView) findViewById(R.id.connectionMessage);
         messageView = (TextView) findViewById(R.id.message);
+        button_connect = (Button) findViewById(R.id.button_connect);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         if (bluetoothAdapter == null) {
             Toast.makeText(getApplicationContext(), "Device doesnt Support Bluetooth", Toast.LENGTH_SHORT).show();
-        }
-        if (!bluetoothAdapter.isEnabled()) {
+        } else if (!bluetoothAdapter.isEnabled()) {
             Intent enableAdapter = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableAdapter, 0);
         }
@@ -73,10 +75,12 @@ public class MainActivity extends AppCompatActivity {
     public void connect(View view) {
         BluetoothDevice device = getBluetoothDevice();
         try {
+            button_connect.setEnabled(false);
             socket = makeSocketConnection(device);
             final BufferedReader reader = getBufferedReader(socket);
             pollInput(reader);
         } catch (IOException e) {
+            button_connect.setEnabled(true);
             e.printStackTrace();
         }
     }
@@ -131,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(
                 new Runnable() {
                     public void run() {
-                        connectionMessageView.setText(messageText);
+                        connectionMessageView.setHint(messageText);
                     }
                 });
     }
@@ -141,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             socket.close();
             setConnectionMessageText("Waiting for connection");
             setMessageText("...");
+            button_connect.setEnabled(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
