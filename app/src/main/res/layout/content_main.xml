@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:hint="Waiting for connection"
-        android:id="@+id/textView_small"
+        android:id="@+id/connectionMessage"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -27,11 +27,11 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="..."
-        android:id="@+id/textView_large"
+        android:id="@+id/message"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="77dp"
-        android:textSize="100dp" />
+        android:textSize="50dp" />
 
     <Button
         style="?android:attr/buttonStyleSmall"
