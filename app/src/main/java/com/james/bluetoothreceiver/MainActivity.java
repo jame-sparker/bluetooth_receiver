@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,6 +22,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     private BluetoothAdapter bluetoothAdapter;
     private BluetoothSocket socket;
     private Button button_connect;
+    private ArrayList<Character> characterStorage = new ArrayList<>();
+    private ArrayList<MorseBit> bitStorage = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,16 +115,39 @@ public class MainActivity extends AppCompatActivity {
     private void pollInput(final BufferedReader reader) {
         new Thread(new Runnable() {
             public void run() {
+                long last = System.nanoTime();
                 while (true) {
                     try {
                         String line = reader.readLine();
-                        setMessageText(line);
+                        if (line.equals("ON")) {
+                            long difference = System.nanoTime() - last;
+                            last = System.nanoTime();
+                            if (nanosecondsToSeconds(difference) >= 2) {
+                                Log.i("James","Turned on");
+                                char newCharacter = MorseBit.bitsToChar(bitStorage);
+                                characterStorage.add(newCharacter);
+                                bitStorage.clear();
+                                setMessageText(characterStorage.toString());
+                            }
+                        } else if (line.equals("OFF")){
+                            Log.i("James","Turned off");
+                            long difference = System.nanoTime() - last;
+                            last = System.nanoTime();
+                            MorseBit bit = MorseBit.instanceOf(nanosecondsToSeconds(difference));
+                            bitStorage.add(bit);
+                        } else {
+                            Log.e("James", "ERROR");
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }).start();
+    }
+
+    private double nanosecondsToSeconds(long nanoseconds) {
+        return nanoseconds/1_000_000_000.0;
     }
 
     private void setMessageText(final String messageText) {
