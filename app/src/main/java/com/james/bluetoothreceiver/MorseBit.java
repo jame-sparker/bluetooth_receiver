@@ -1,17 +1,20 @@
 package com.james.bluetoothreceiver;
 
+import java.util.List;
+
 /**
  * Created by james on 26/06/16.
  */
 public enum MorseBit {
     LONG, SHORT;
 
-    public MorseBit instanceOf( double time){
-        if(time <= 0.7) return SHORT;
-        else if(time <= 2) return LONG;
-        throw new IllegalArgumentException(" Time must be less than 2 seconds");
+    public static MorseBit instanceOf(double time) {
+        if (time <= 0.7) {
+            return SHORT;
+        } else {
+            return LONG;
+        }
     }
-
 
     @Override
     public String toString() {
@@ -25,63 +28,63 @@ public enum MorseBit {
         }
     }
 
-    public char bitsToChar( MorseBit bits[] ){
+    public static char bitsToChar(List<MorseBit> bits) {
         String bitString = "";
-        for( MorseBit m : bits){
+        for (MorseBit m : bits) {
             bitString += m;
         }
-        switch (bitString){
-            case(".-"):
+        switch (bitString) {
+            case (".-"):
                 return 'A';
-            case("-..."):
+            case ("-..."):
                 return 'B';
-            case("-.-."):
+            case ("-.-."):
                 return 'C';
-            case("-.."):
+            case ("-.."):
                 return 'D';
-            case("."):
+            case ("."):
                 return 'E';
-            case("..-."):
+            case ("..-."):
                 return 'F';
-            case("--."):
+            case ("--."):
                 return 'G';
-            case("...."):
+            case ("...."):
                 return 'H';
-            case(".."):
+            case (".."):
                 return 'I';
-            case(".---"):
+            case (".---"):
                 return 'J';
-            case("-.-"):
+            case ("-.-"):
                 return 'K';
-            case(".-.."):
+            case (".-.."):
                 return 'L';
-            case("--"):
+            case ("--"):
                 return 'M';
-            case("-."):
+            case ("-."):
                 return 'N';
-            case("---"):
+            case ("---"):
                 return 'O';
-            case(".--."):
+            case (".--."):
                 return 'P';
-            case("--.-"):
+            case ("--.-"):
                 return 'Q';
-            case(".-."):
+            case (".-."):
                 return 'R';
-            case("..."):
+            case ("..."):
                 return 'S';
-            case("-"):
+            case ("-"):
                 return 'T';
-            case("..-"):
+            case ("..-"):
                 return 'U';
-            case("...-"):
+            case ("...-"):
                 return 'V';
-            case(".--"):
+            case (".--"):
                 return 'W';
-            case("-..-"):
+            case ("-..-"):
                 return 'X';
-            case("-.--"):
+            case ("-.--"):
                 return 'Y';
-            case("--.."):
+            case ("--.."):
                 return 'Z';
             default:
                 return '0';
